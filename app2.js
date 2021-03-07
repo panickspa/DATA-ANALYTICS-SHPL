@@ -21,12 +21,13 @@ function bConvert(o){
 
 /* Getting result */
 var result = []
-for (var i=0; i<3000; i++){
+for (var i=0; i<50; i++){
     console.log(i)
     let e = data[i]
     var dTemp = data
     var flag = true
     var oNow = e
+    var tIdx = i
     var linkage = []
     var temp = {}
     var contacts = e.Contacts;
@@ -34,17 +35,20 @@ for (var i=0; i<3000; i++){
     /* 
         Analyze data    
     */
+    dTemp.splice(i,1);
     while(flag){
         oNow = bConvert(oNow)
-        dTemp = dTemp.filter(e => e.Id != oNow.Id)
+        // dTemp = dTemp.filter(e => e.Id != oNow.Id)
         // console.log(dTemp.length)
         if(oNow.Email){
-            temp = dTemp.find(e => e.Email == oNow.Email && e.Id != oNow.Id)
+            tIdx = dTemp.findIndex(e => e.Email == oNow.Email)
             // console.log(temp)
-            if(temp){
+            if(tIdx > -1){
+                temp = dTemp[tIdx]
                 linkage.push(
                     temp.Id
                 )
+                dTemp.splice(tIdx, 1)
                 oNow.Id = temp.Id
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
@@ -54,11 +58,13 @@ for (var i=0; i<3000; i++){
                 oNow = {}
             }
         }else if(oNow.Phone){
-            temp = dTemp.find(e => e.Phone == oNow.Phone && e.Id != oNow.iId)
-            if(temp){
+            tIdx = dTemp.findIndex(e => e.Phone == oNow.Phone)
+            if(tIdx > -1){
+                temp = dTemp[tIdx]
                 linkage.push(
                     temp.Id
                 )
+                dTemp.splice(tIdx, 1)
                 oNow.Id = temp.Id
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
@@ -68,11 +74,13 @@ for (var i=0; i<3000; i++){
                 oNow = {}
             }
         }else if(oNow.OrderId){
-            temp = dTemp.find(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
-            if(temp){
+            tIdx = dTemp.findIndex(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
+            if(tIdx > -1){
+                temp = dTemp[tIdx]
                 linkage.push(
                     temp.Id
                 )
+                dTemp.splice(tIdx, 1)
                 oNow.Id = temp.Id
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
@@ -86,15 +94,36 @@ for (var i=0; i<3000; i++){
             // console.log("false")
         }
     }    
-    if(linkage.length > 0) 
-    result.push( {
-        ticket_id: data[i].Id,
-        "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
-    })
-    else result.push( {
-        ticket_id: data[i].Id,
-        "ticket_trace/contact": `${data[i].id}, ${contacts}`
-    })
+    if(linkage.length > 0) {
+        linkage.push(data[i].Id)
+        linkage.sort(
+            function(a,b){
+                return Number(a) - Number(b)
+            }
+        )
+        console.log({
+            ticket_id: data[i].Id,
+            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+        })
+        result.push( {
+            ticket_id: data[i].Id,
+            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+        })
+    }
+    else {
+        console.log(
+            {
+                ticket_id: data[i].Id,
+                "ticket_trace/contact": `${data[i].Id}, ${contacts}`
+            }
+        )
+        result.push(
+            {
+                ticket_id: data[i].Id,
+                "ticket_trace/contact": `${data[i].Id}, ${contacts}`
+            }
+        )
+    }
 }
 
 // var result = data.map((e,i,a) => {
