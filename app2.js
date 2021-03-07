@@ -160,7 +160,7 @@ try {
     console.log("parsing ...")
     const parser = new Parser(opts)
     const csv = parser.parse(result)
-    fs.writeFileSync(`./result_2_${new Date()}.csv`, csv, function(err){
+    fs.writeFileSync(`./result_2.csv`, csv, function(err){
         if(err) console.error(err)
         console.log("done!!")
     })
