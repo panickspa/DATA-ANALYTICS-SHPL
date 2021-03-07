@@ -1,173 +1,37 @@
-const fs = require("fs")
-const { Parser } = require('json2csv');
+const { Worker } = require('worker_threads') 
+
 /* 
-    Read json file
+    Creating worker
 */
-var e = fs.readFileSync("./contacts.json",{
-    encoding: "utf8"
-})
 
-const data = JSON.parse(e)
+const n = 500000
 
-// console.log(data.length)
+const thread = 2
 
-
-/* Convert "" to undefined */
-function bConvert(o){
-    o.Email = o.Email ? o.Email.length > 0 ? o.Email : undefined : undefined
-    o.Phone = o.Phone ? o.Phone.length > 0 ? o.Phone : undefined : undefined
-    o.OrderId = o.OrderId ? o.OrderId.length > 0 ? o.OrderId : undefined : undefined
-    return o
-}
-
-/* Sum Contacts */
-
-// function sumContacts(a,b){
-//     return isNaN(Number(a.Contacts)) ? 0 : Number(a.Contacts) + isNaN(Number(b.Contacts)) ? 0 : Number(b.Contacts)
-// }
-
-/* Getting result */
-var result = []
-console.log("analyzing ...")
-
-const n = 1000
-
-for (var i=0; i<n; i++){
-    // console.log(e)
-    // let dTemp = [data].flat()
-    let flag = true
-    let oNow = {
-        id: data[i].Id,
-        tIdx: data[i].Id,
-        Email: data[i].Email,
-        Phone: data[i].Phone,
-        Contacts: data[i].Contacts,
-        OrderId: data[i].OrderId
-    }
-    let linkage = []
-    let temp = {}
-    while(flag){
-        oNow = bConvert(oNow)
-        // console.log(e.Email == oNow.Email, e.Id != data[i].Id && e.Id != oNow.Id, !linkage.find(l => e.Id == l.Id))
-        if(oNow.Email){
-            oNow.tIdx = data.findIndex(
-                e => e.Email == oNow.Email && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(l => e.Id == l.Id)
-            )
-            if(oNow.tIdx > -1){
-                temp = {
-                    obj: data[oNow.tIdx],
-                }
-                linkage.push({
-                    Id: data[oNow.tIdx].Id,
-                    Contacts: isNaN(Number(data[oNow.tIdx].Contacts)) ? 0 : Number(data[oNow.tIdx].Contacts)
-                })
-                oNow = {
-                    Id: temp.obj.Id,
-                    Email: temp.obj.Email,
-                    Phone: temp.obj.Phone,
-                    OrderId: temp.obj.OrderId,
-                    Contacts: isNaN(Number(temp.obj.Contacts)) ? 0 : Number(temp.obj.Contacts),
-                }
-                // temp.Contacts = temp.Contacts + (isNaN(temp.obj.Contacts) ? temp.obj.Contacts : 0)
-            }else{
-                oNow.Email = undefined
-            }
-        }else if(oNow.Phone){
-            oNow.tIdx = data.findIndex(
-                e => e.Phone == oNow.Phone && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(l => e.Id == l.Id)
-            )
-            if(oNow.tIdx > -1){
-                temp = {
-                    obj: data[oNow.tIdx],
-                    Contacts: data[oNow.tIdx].Contacts
-                }
-                linkage.push({
-                    Id: data[oNow.tIdx].Id,
-                    Contacts: isNaN(Number(data[oNow.tIdx].Contacts)) ? 0 : Number(data[oNow.tIdx].Contacts)
-                })
-                oNow = {
-                    Id: temp.obj.Id,
-                    Email: temp.obj.Email,
-                    Phone: temp.obj.Phone,
-                    OrderId: temp.obj.OrderId,
-                    Contacts: isNaN(Number(temp.obj.Contacts)) ? 0 : Number(temp.obj.Contacts),
-                }
-                // temp.Contacts = temp.Contacts+(isNaN(temp.Contacts) ? temp.Contacts : 0)
-            }else{
-                oNow.Phone = undefined
-            }
-        }else if(oNow.OrderId){
-            oNow.tIdx = data.findIndex(
-                e => e.OrderId == oNow.OrderId && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(l => e.Id == l.Id)
-            )
-            if(oNow.tIdx > -1){
-                temp = {
-                    obj: data[oNow.tIdx],
-                }
-                linkage.push({
-                    Id: data[oNow.tIdx].Id,
-                    Contacts: isNaN(Number(data[oNow.tIdx].Contacts)) ? 0 : Number(data[oNow.tIdx].Contacts)
-                })
-                oNow = {
-                    Id: temp.obj.Id,
-                    Email: temp.obj.Email,
-                    Phone: temp.obj.Phone,
-                    OrderId: temp.obj.OrderId,
-                    Contacts: isNaN(Number(temp.obj.Contacts)) ? 0 : Number(temp.obj.Contacts),
-                }
-                // temp.Contacts = temp.Contacts+(isNaN(temp.obj.Contacts) ? temp.obj.Contacts : 0)
-            }else{
-                oNow.OrderId = undefined
-            }
-        }else{
-            flag = false
-        }
-        // console.log(linkage.reduce(sumContacts,0))
-    }
-    if(linkage.length > 0) {
-        linkage.push({Id:data[i].Id, Contacts:isNaN(Number(data[i].Contacts)) ? 0 : Number(data[i].Contacts) })
-        linkage.sort(
-            function(a,b){
-                return Number(a) - Number(b)
-            }
+function runWorker(workerData){
+    return new Promise((res, rej) => {
+        const worker = new Worker(
+            "./worker.js", {workerData}
         )
-        let rObj = {
-            ticket_id: data[i].Id,
-            "ticket_trace/contact": `${linkage.map(e => e.Id).join("-")}, ${linkage.map(e => e.Contacts).reduce((a,b)=>a+b,0)}`
-        }
-        console.log(i,rObj["ticket_trace/contact"])
-        result.push(rObj)
-    }
-    else {
-        let rObj = {
-            ticket_id: data[i].Id,
-            "ticket_trace/contact": `${i}, ${data[i].Contacts}`
-        }
-        console.log(i,
-            rObj["ticket_trace/contact"]
-        )
-        result.push(
-            rObj
-        )
-    }
-}
-
-const fields = ['ticket_id', 'ticket_trace/contact'];
-const opts = { fields };
-
-try {
-    /* 
-        Parsing json to csv
-    */
-    console.log("parsing ...")
-    const parser = new Parser(opts)
-    const csv = parser.parse(result)
-    fs.writeFileSync(`./result_3.csv`, csv, function(err){
-        if(err) console.error(err)
-        console.log("done!!")
+        worker.on('message', (e)=>{
+            console.log(e)
+        })
+        worker.on('error', rej)
+        worker.on('exit', code => {
+            if(code !== 0){
+                rej(new Error(`Stopped the Worker Thread with the exit code: ${code}`))
+            }
+        })
     })
-} catch (err) {
-    console.error(err)
+}
+async function run(range) {
+    await runWorker(
+        {
+            data: "./contacts.json",
+            range: range
+        }
+    )
 }
 
-
+run([0,50000]).catch(err => {console.error(err)})
+run([50000,100000]).catch(err => {console.error(err)})
