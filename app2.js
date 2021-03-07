@@ -9,10 +9,6 @@ var e = fs.readFileSync("./contacts.json",{
 
 const data = JSON.parse(e)
 
-// const data = dataRaw.filter(e => e.Email.length > 0 || e.Phone.length > 0 || e.OrderId.length > 0)
-
-// console.log(data)
-
 console.log(data.length)
 
 const { Parser } = require('json2csv');
@@ -136,9 +132,9 @@ try {
         Parsing json to csv
     */
     console.log("parsing ...")
-    // const parser = new Parser(opts)
-    // const csv = parser.parse(result)
-    fs.writeFileSync(`./result_2_${new Date()}.csv`, JSON.stringify(result), function(err){
+    const parser = new Parser(opts)
+    const csv = parser.parse(result)
+    fs.writeFileSync(`./result_2_${new Date()}.csv`, csv, function(err){
         if(err) console.error(err)
         console.log("done!!")
     })
