@@ -1,0 +1,24 @@
+{
+  "name": "shpl_multichannel_contacts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "gpu.js": "^2.11.2",
+    "json2csv": "^5.0.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panickspa/DATA-ANALYTICS-SHPL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/panickspa/DATA-ANALYTICS-SHPL/issues"
+  },
+  "homepage": "https://github.com/panickspa/DATA-ANALYTICS-SHPL#readme"
+}
