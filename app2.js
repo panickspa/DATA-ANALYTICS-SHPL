@@ -56,7 +56,7 @@ for (var i in data){
                 oNow.OrderId = temp.OrderId
                 contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.Email = undefined
             }
         }else if(oNow.Phone){
             oNow.tIdx = data.findIndex(e => e.Phone == oNow.Phone && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(id => e.Id == id))
@@ -71,7 +71,7 @@ for (var i in data){
                 oNow.OrderId = temp.OrderId
                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.Phone = undefined
             }
         }else if(oNow.OrderId){
             oNow.tIdx = data.findIndex(e => e.OrderId == oNow.OrderId && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(id => e.Id == id))
@@ -86,7 +86,7 @@ for (var i in data){
                 oNow.OrderId = temp.OrderId
                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.OrderId = undefined
             }
         }else{
             flag = false

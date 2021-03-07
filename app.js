@@ -48,7 +48,7 @@ var result = data.map((e,i,a) => {
                 oNow.OrderId = temp.OrderId
                 contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.Email = undefined
             }
         }else if(oNow.Phone){
             temp = dTemp.find(e => e.Phone == oNow.Phone && e.Id != oNow.iId)
@@ -62,7 +62,7 @@ var result = data.map((e,i,a) => {
                 oNow.OrderId = temp.OrderId
                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.Phone = undefined
             }
         }else if(oNow.OrderId){
             temp = dTemp.find(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
@@ -76,7 +76,7 @@ var result = data.map((e,i,a) => {
                 oNow.OrderId = temp.OrderId
                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                oNow = {}
+                oNow.OrderId = undefined
             }
         }else{
             flag = false
