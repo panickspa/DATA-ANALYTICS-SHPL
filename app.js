@@ -19,6 +19,11 @@ function bConvert(o){
     return o
 }
 
+/* Sum Callback */
+function sumContact(a,b){
+    return a.Contacts+b.Contacts
+}
+
 /* Getting result */
 var result = data.map((e,i,a) => {
     var dTemp = a
@@ -26,7 +31,7 @@ var result = data.map((e,i,a) => {
     var oNow = e
     var linkage = []
     var temp = {}
-    var contacts = e.Contacts;
+    // var contacts = e.Contacts;
     // console.log("contacts 36", typeof contacts, contacts)
     /* 
         Analyze data    
@@ -39,14 +44,15 @@ var result = data.map((e,i,a) => {
             temp = dTemp.find(e => e.Email == oNow.Email && e.Id != oNow.Id)
             // console.log(temp)
             if(temp){
-                linkage.push(
-                    temp.Id
-                )
+                linkage.push({
+                    Id: temp.Id,
+
+                })
                 oNow.Id = temp.Id
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
                 oNow.OrderId = temp.OrderId
-                contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                // contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
                 oNow.Email = undefined
             }
@@ -60,7 +66,7 @@ var result = data.map((e,i,a) => {
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
                 oNow.OrderId = temp.OrderId
-                contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                // contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
                 oNow.Phone = undefined
             }
@@ -74,7 +80,7 @@ var result = data.map((e,i,a) => {
                 oNow.Email = temp.Email
                 oNow.Phone = temp.Phone
                 oNow.OrderId = temp.OrderId
-                contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                // contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
                 oNow.OrderId = undefined
             }
@@ -87,12 +93,12 @@ var result = data.map((e,i,a) => {
         console.log(
             {
                 ticket_id: a[i].Id,
-                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+                "ticket_trace/contact": `${linkage.map(e => e.id).join("-")}, ${contacts.reduce(sumArray,0)}`
             }
         )
         return {
             ticket_id: a[i].Id,
-            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+            "ticket_trace/contact": `${linkage.map(e => e.id).join("-")}, ${contacts.reduce(sumArray,0)}`
         }
     }
     else{
