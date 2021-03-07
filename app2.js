@@ -7,9 +7,9 @@ var e = fs.readFileSync("./contacts.json",{
     encoding: "utf8"
 })
 
-const dataRaw = JSON.parse(e)
+const data = JSON.parse(e)
 
-const data = dataRaw.filter(e => e.Email.length > 0 || e.Phone.length > 0 || e.OrderId.length > 0)
+// const data = dataRaw.filter(e => e.Email.length > 0 || e.Phone.length > 0 || e.OrderId.length > 0)
 
 // console.log(data)
 
