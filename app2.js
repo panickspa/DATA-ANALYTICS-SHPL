@@ -91,6 +91,10 @@ for (var i=0; i<3000; i++){
         ticket_id: data[i].Id,
         "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
     })
+    else result.push( {
+        ticket_id: data[i].Id,
+        "ticket_trace/contact": `${data[i].id}, ${contacts}`
+    })
 }
 
 // var result = data.map((e,i,a) => {

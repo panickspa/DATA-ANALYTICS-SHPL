@@ -83,11 +83,31 @@ var result = data.map((e,i,a) => {
             // console.log("false")
         }
     }    
-    if(linkage.length > 0) 
-    return {
-        ticket_id: a[i].Id,
-        "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+    if(linkage.length > 0) {
+        console.log(
+            {
+                ticket_id: a[i].Id,
+                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+            }
+        )
+        return {
+            ticket_id: a[i].Id,
+            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+        }
     }
+    else{
+        console.log(
+            {
+                ticket_id: a[i].Id,
+                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+            }
+        )
+        return {
+            ticket_id: a[i].Id,
+            "ticket_trace/contact": `${a[i].id}, ${contacts}`
+        }
+    }
+    
 });
 
 const fields = ['ticket_id', 'ticket_trace/contact'];
