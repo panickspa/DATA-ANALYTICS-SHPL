@@ -36,10 +36,9 @@ for (var i=0; i<data.length; i++){
             Analyze data    
         */
         dTemp.splice(i,1);
+        oNow.tracedBy = []
         while(flag){
             oNow = bConvert(oNow)
-            // dTemp = dTemp.filter(e => e.Id != oNow.Id)
-            // console.log(dTemp.length)
             if(oNow.Email){
                 tIdx = dTemp.findIndex(e => e.Email == oNow.Email)
                 // console.log(temp)
@@ -54,8 +53,10 @@ for (var i=0; i<data.length; i++){
                     oNow.Phone = temp.Phone
                     oNow.OrderId = temp.OrderId
                     contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                    oNow.tracedBy.push("Email")
                 }else{
-                    oNow = {}
+                    oNow.tracedBy.push("Email")
+                    oNow.Email = undefined
                 }
             }else if(oNow.Phone){
                 tIdx = dTemp.findIndex(e => e.Phone == oNow.Phone)
@@ -70,8 +71,10 @@ for (var i=0; i<data.length; i++){
                     oNow.Phone = temp.Phone
                     oNow.OrderId = temp.OrderId
                     contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                    oNow.tracedBy.push("Phone")
                 }else{
-                    oNow = {}
+                    oNow.tracedBy.push("Phone")
+                    oNow.Phone = undefined
                 }
             }else if(oNow.OrderId){
                 tIdx = dTemp.findIndex(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
@@ -86,16 +89,19 @@ for (var i=0; i<data.length; i++){
                     oNow.Phone = temp.Phone
                     oNow.OrderId = temp.OrderId
                     contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+                    oNow.tracedBy.push("OrderId")
                 }else{
-                    oNow = {}
+                    oNow.tracedBy.push("OrderId")
+                    oNow.OrderId = undefined
                 }
             }else{
+                oNow.tracedBy = []
                 flag = false
                 // console.log("false")
             }
         }    
         if(linkage.length > 0) {
-            linkage.push(data[i].Id)
+            linkage.push(data[i])
             linkage.sort(
                 function(a,b){
                     return Number(a) - Number(b)
@@ -103,11 +109,11 @@ for (var i=0; i<data.length; i++){
             )
             console.log({
                 ticket_id: data[i].Id,
-                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+                "ticket_trace/contact": `${linkage.map(e => e.Id).join("-")}, ${contacts}`
             })
             result.push( {
                 ticket_id: data[i].Id,
-                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+                "ticket_trace/contact": `${linkage.map(e => e.Id).join("-")}, ${contacts}`
             })
         }
         else {
