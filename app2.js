@@ -7,7 +7,9 @@ var e = fs.readFileSync("./contacts.json",{
     encoding: "utf8"
 })
 
-var data = JSON.parse(e)
+const data = JSON.parse(e)
+
+console.log(data.length)
 
 const { Parser } = require('json2csv');
 
@@ -21,193 +23,120 @@ function bConvert(o){
 
 /* Getting result */
 var result = []
-for (var i=0; i<data.length; i++){
-    if(data[i]){
-        let e = data[i]
-        var dTemp = data
-        var flag = true
-        var oNow = e
-        var tIdx = i
-        var linkage = []
-        var temp = {}
-        var contacts = e.Contacts;
-        // console.log("contacts 36", typeof contacts, contacts)
-        /* 
-            Analyze data    
-        */
-        dTemp.splice(i,1);
-        while(flag){
-            oNow = bConvert(oNow)
-            // dTemp = dTemp.filter(e => e.Id != oNow.Id)
-            // console.log(dTemp.length)
-            if(oNow.Email){
-                tIdx = dTemp.findIndex(e => e.Email == oNow.Email)
-                // console.log(temp)
-                if(tIdx > -1){
-                    temp = dTemp[tIdx]
-                    linkage.push(
-                        temp.Id
-                    )
-                    dTemp.splice(tIdx, 1)
-                    oNow.Id = temp.Id
-                    oNow.Email = temp.Email
-                    oNow.Phone = temp.Phone
-                    oNow.OrderId = temp.OrderId
-                    contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-                }else{
-                    oNow = {}
-                }
-            }else if(oNow.Phone){
-                tIdx = dTemp.findIndex(e => e.Phone == oNow.Phone)
-                if(tIdx > -1){
-                    temp = dTemp[tIdx]
-                    linkage.push(
-                        temp.Id
-                    )
-                    dTemp.splice(tIdx, 1)
-                    oNow.Id = temp.Id
-                    oNow.Email = temp.Email
-                    oNow.Phone = temp.Phone
-                    oNow.OrderId = temp.OrderId
-                    contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-                }else{
-                    oNow = {}
-                }
-            }else if(oNow.OrderId){
-                tIdx = dTemp.findIndex(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
-                if(tIdx > -1){
-                    temp = dTemp[tIdx]
-                    linkage.push(
-                        temp.Id
-                    )
-                    dTemp.splice(tIdx, 1)
-                    oNow.Id = temp.Id
-                    oNow.Email = temp.Email
-                    oNow.Phone = temp.Phone
-                    oNow.OrderId = temp.OrderId
-                    contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-                }else{
-                    oNow = {}
-                }
+console.log("analyzing ...")
+
+for (var i in data){
+    // console.log(e)
+    // let dTemp = [data].flat()
+    let flag = true
+    let oNow = {
+        id: data[i].Id,
+        tIdx: data[i].Id,
+        Email: data[i].Email,
+        Phone: data[i].Phone,
+        Contacts: data[i].Contacts,
+        OrderId: data[i].OrderId
+    }
+    let linkage = []
+    let temp = {}
+    let contacts = data[i].Contacts;
+    // dTemp.splice(tIdx,1);
+    while(flag){
+        oNow = bConvert(oNow)
+        if(oNow.Email){
+            oNow.tIdx = data.findIndex(e => e.Email == oNow.Email && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(id => e.Id == id) )
+            if(oNow.tIdx > -1){
+                temp = data[oNow.tIdx]
+                linkage.push(
+                    temp.Id
+                )
+                oNow.Id = temp.Id
+                oNow.Email = temp.Email
+                oNow.Phone = temp.Phone
+                oNow.OrderId = temp.OrderId
+                contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
             }else{
-                flag = false
-                // console.log("false")
+                oNow = {}
             }
-        }    
-        if(linkage.length > 0) {
-            linkage.push(data[i].Id)
-            linkage.sort(
-                function(a,b){
-                    return Number(a) - Number(b)
-                }
-            )
-            console.log({
-                ticket_id: data[i].Id,
-                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
-            })
-            result.push( {
-                ticket_id: data[i].Id,
-                "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
-            })
-        }
-        else {
-            console.log(
-                {
-                    ticket_id: data[i].Id,
-                    "ticket_trace/contact": `${data[i].Id}, ${contacts}`
-                }
-            )
-            result.push(
-                {
-                    ticket_id: data[i].Id,
-                    "ticket_trace/contact": `${data[i].Id}, ${contacts}`
-                }
-            )
+        }else if(oNow.Phone){
+            oNow.tIdx = data.findIndex(e => e.Phone == oNow.Phone && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(id => e.Id == id))
+            if(oNow.tIdx > -1){
+                temp = data[oNow.tIdx]
+                linkage.push(
+                    temp.Id
+                )
+                oNow.Id = temp.Id
+                oNow.Email = temp.Email
+                oNow.Phone = temp.Phone
+                oNow.OrderId = temp.OrderId
+                contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+            }else{
+                oNow = {}
+            }
+        }else if(oNow.OrderId){
+            oNow.tIdx = data.findIndex(e => e.OrderId == oNow.OrderId && e.Id != data[i].Id && e.Id != oNow.Id && !linkage.find(id => e.Id == id))
+            if(oNow.tIdx > -1){
+                temp = data[oNow.tIdx]
+                linkage.push(
+                    temp.Id
+                )
+                oNow.Id = temp.Id
+                oNow.Email = temp.Email
+                oNow.Phone = temp.Phone
+                oNow.OrderId = temp.OrderId
+                contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
+            }else{
+                oNow = {}
+            }
+        }else{
+            flag = false
         }
     }
+    if(linkage.length > 0) {
+        linkage.push(data[i].Id)
+        linkage.sort(
+            function(a,b){
+                return Number(a) - Number(b)
+            }
+        )
+        console.log(i,{
+            ticket_id: data[i].Id,
+            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+        })
+        result.push( {
+            ticket_id: data[i].Id,
+            "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
+        })
+    }
+    else {
+        console.log(i,
+            {
+                ticket_id: data[i].Id,
+                "ticket_trace/contact": `${i}, ${contacts}`
+            }
+        )
+        result.push(
+            {
+                ticket_id: data[i].Id,
+                "ticket_trace/contact": `${i}, ${contacts}`
+            }
+        )
+    }
 }
-
-// var result = data.map((e,i,a) => {
-//     var dTemp = a
-//     var flag = true
-//     var oNow = e
-//     var linkage = []
-//     var temp = {}
-//     var contacts = e.Contacts;
-//     // console.log("contacts 36", typeof contacts, contacts)
-//     /* 
-//         Analyze data    
-//     */
-//     while(flag){
-//         oNow = bConvert(oNow)
-//         dTemp = dTemp.filter(e => e.Id != oNow.Id)
-//         // console.log(dTemp.length)
-//         if(oNow.Email){
-//             temp = dTemp.find(e => e.Email == oNow.Email && e.Id != oNow.Id)
-//             // console.log(temp)
-//             if(temp){
-//                 linkage.push(
-//                     temp.Id
-//                 )
-//                 oNow.Id = temp.Id
-//                 oNow.Email = temp.Email
-//                 oNow.Phone = temp.Phone
-//                 oNow.OrderId = temp.OrderId
-//                 contacts = contacts + (isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-//             }else{
-//                 oNow = {}
-//             }
-//         }else if(oNow.Phone){
-//             temp = dTemp.find(e => e.Phone == oNow.Phone && e.Id != oNow.iId)
-//             if(temp){
-//                 linkage.push(
-//                     temp.Id
-//                 )
-//                 oNow.Id = temp.Id
-//                 oNow.Email = temp.Email
-//                 oNow.Phone = temp.Phone
-//                 oNow.OrderId = temp.OrderId
-//                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-//             }else{
-//                 oNow = {}
-//             }
-//         }else if(oNow.OrderId){
-//             temp = dTemp.find(e => e.OrderId == oNow.OrderId && e.Id != oNow.Id)
-//             if(temp){
-//                 linkage.push(
-//                     temp.Id
-//                 )
-//                 oNow.Id = temp.Id
-//                 oNow.Email = temp.Email
-//                 oNow.Phone = temp.Phone
-//                 oNow.OrderId = temp.OrderId
-//                 contacts = contacts+(isNaN(oNow.Contacts) ? oNow.Contacts : 0)
-//             }else{
-//                 oNow = {}
-//             }
-//         }else{
-//             flag = false
-//             // console.log("false")
-//         }
-//     }    
-//     if(linkage.length > 0) 
-//     return {
-//         ticket_id: a[i].Id,
-//         "ticket_trace/contact": `${linkage.join("-")}, ${contacts}`
-//     }
-// });
 
 const fields = ['ticket_id', 'ticket_trace/contact'];
 const opts = { fields };
 
 try {
     /* 
-        Parseing json to csv
+        Parsing json to csv
     */
-    const parser = new Parser(opts)
-    const csv = parser.parse(result)
-    fs.writeFileSync("./result_2.csv", csv, function(err){
+    console.log("parsing ...")
+    // const parser = new Parser(opts)
+    // const csv = parser.parse(result)
+    fs.writeFileSync(`./result_2_${new Date()}.csv`, JSON.stringify(result), function(err){
         if(err) console.error(err)
+        console.log("done!!")
     })
 } catch (err) {
     console.error(err)
